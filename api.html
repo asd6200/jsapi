@@ -1,0 +1,207 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Weather App</title>
+    <link rel="stylesheet" href="api.css">
+</head>
+<body>
+
+    <div class="weather-app">
+        <h1>Weather Check</h1>
+        
+        <div class="search-box">
+            <input type="text" id="city-input" placeholder="Enter city name..." autocomplete="off">
+            <button id="search-btn">Search</button>
+        </div>
+
+        <div class="weather-info" id="weather-display">
+            <p>Enter a city name and click 'Search' to see the weather!</p>
+            </div>
+
+        <div class="error-message" id="error-message"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    const cityInput = document.getElementById('city-input');
+    const searchBtn = document.getElementById('search-btn');
+    const weatherDisplay = document.getElementById('weather-display');
+    const errorMessage = document.getElementById('error-message');
+
+    // !!! IMPORTANT: Replace 'YOUR_API_KEY_HERE' with your actual OpenWeather API key
+    const API_KEY = 'YOUR_API_KEY_HERE'; 
+    const BASE_URL = 'api.open-meteo.com';
+
+    // Event listener for the search button
+    searchBtn.addEventListener('click', () => {
+        const city = cityInput.value.trim();
+        if (city) {
+            getWeather(city);
+        } else {
+            displayError('Please enter a city name.');
+        }
+    });
+
+    // Main function to fetch weather data
+    async function getWeather(city) {
+        // Clear previous messages
+        weatherDisplay.innerHTML = '';
+        errorMessage.textContent = '';
+        weatherDisplay.textContent = 'Fetching weather...';
+
+        // Construct the full API URL
+        const url = `${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`; // units=metric gives temperature in Celsius
+
+        // Requirement: Handle wrong city input using try/catch
+        try {
+            // Requirement: Use fetch() to call OpenWeather API
+            const response = await fetch(url);
+            
+            // Check if the city was found (HTTP status 404 is common for bad city names)
+            if (!response.ok) {
+                // Throw an error that will be caught by the catch block
+                throw new Error('City not found. Please check the spelling.');
+            }
+
+            const data = await response.json();
+            displayWeather(data);
+
+        } catch (error) {
+            // Catches network errors or the custom error thrown above
+            console.error('Weather fetching error:', error);
+            displayError(error.message);
+        }
+    }
+
+    // Function to display the weather information
+    function displayWeather(data) {
+        // Requirement: Show temperature, humidity, weather condition
+        
+        // Convert Kelvin to Celsius if units was not specified (though we used units=metric)
+        const temperature = data.main.temp; 
+        const humidity = data.main.humidity;
+        const condition = data.weather[0].description;
+        const cityName = data.name;
+
+        // Capitalize the first letter of the condition for better display
+        const capitalizedCondition = condition.charAt(0).toUpperCase() + condition.slice(1);
+
+        weatherDisplay.innerHTML = `
+            <h2>${cityName}</h2>
+            <p><strong>Temperature:</strong> ${temperature}°C</p>
+            <p><strong>Humidity:</strong> ${humidity}%</p>
+            <p><strong>Condition:</strong> ${capitalizedCondition}</p>
+        `;
+    }
+
+    // Function to display error messages
+    function displayError(message) {
+        weatherDisplay.innerHTML = ''; // Clear weather info
+        errorMessage.textContent = `Error: ${message}`;
+    }
+});
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weather App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .weather-box {
+      background: #1e293b;
+      padding: 25px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 8px;
+      background: #38bdf8;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .result {
+      margin-top: 15px;
+    }
+
+    .error {
+      color: #f87171;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="weather-box">
+    <h2>🌤 Weather App</h2>
+
+    <input type="text" id="city" placeholder="Enter city name">
+    <button onclick="getWeather()">Get Weather</button>
+
+    <div class="result" id="result"></div>
+    <div class="error" id="error"></div>
+  </div>
+
+  <script>
+    async function getWeather() {
+      const city = document.getElementById("city").value;
+      const result = document.getElementById("result");
+      const error = document.getElementById("error");
+
+      result.innerHTML = "";
+      error.innerHTML = "";
+
+      try {
+        const apiKey = "YOUR_API_KEY"; // <-- replace this
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error("City not found");
+        }
+
+        const data = await response.json();
+
+        result.innerHTML = `
+          <p><strong>City:</strong> ${data.name}</p>
+          <p><strong>Temperature:</strong> ${data.main.temp} °C</p>
+          <p><strong>Humidity:</strong> ${data.main.humidity}%</p>
+          <p><strong>Condition:</strong> ${data.weather[0].description}</p>
+        `;
+      } catch (err) {
+        error.innerHTML = "❌ Invalid city name. Please try again.";
+      }
+    }
+  </script>
+
+</body>
+</html>
